@@ -1609,6 +1609,12 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
         serializeAnnotations(result.getAnnotations());
     }
 
+    public void rmSingleNum(){
+        if(this.numberOfWarnings == 5){
+            this.numberOfWarnings--;
+        }
+    }
+
     // Backward compatibility. Do not remove.
     // CHECKSTYLE:OFF
     @Deprecated
