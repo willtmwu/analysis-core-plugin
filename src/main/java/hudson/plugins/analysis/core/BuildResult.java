@@ -1617,7 +1617,12 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
         this.result.removeAnnotation(annotation);
         initialize(this.history, this.owner, this.defaultEncoding, this.result);
         serializeAnnotations(this.getAnnotations());
+
+        //Might have to force recalculations
+        //Force the serialisation into a separate file.
+        //Need to find entry point on startup, or on reload
     }
+
 
     // Backward compatibility. Do not remove.
     // CHECKSTYLE:OFF
