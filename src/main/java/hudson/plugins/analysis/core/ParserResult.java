@@ -1,5 +1,6 @@
 package hudson.plugins.analysis.core;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
@@ -263,6 +264,22 @@ public class ParserResult implements Serializable {
         if (annotations.add(annotation)) {
             Integer count = annotationCountByPriority.get(annotation.getPriority());
             annotationCountByPriority.put(annotation.getPriority(), count + 1);
+            return 1;
+        }
+        return 0;
+    }
+
+    /**
+     * Removes the specified annotation from this container.
+     *
+     * @param annotation the annotation to remove
+     * @return the number of removed annotations
+     */
+    @WithBridgeMethods(value=void.class)
+    public final int removeAnnotation(final FileAnnotation annotation){
+        if (annotations.remove(annotation)) {
+            Integer count = annotationCountByPriority.get(annotation.getPriority());
+            annotationCountByPriority.put(annotation.getPriority(), count - 1);
             return 1;
         }
         return 0;

@@ -86,6 +86,8 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     private int numberOfModules;
     /** The default encoding to be used when reading and parsing files. */
     private String defaultEncoding;
+    /** The ParseResult used to calculate warnings in this BuildResult */
+    private ParserResult result;
 
     /** The project containing the annotations. */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("Se")
@@ -266,6 +268,7 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
         this.history = history;
         this.owner = build;
         this.defaultEncoding = defaultEncoding;
+        this.result = result;
 
         modules = new HashSet<String>(result.getModules());
         numberOfModules = modules.size();
@@ -306,6 +309,8 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
         computeZeroWarningsHighScore(build, result);
 
         defineReferenceBuild(history);
+
+        serializeParserResult();
     }
 
     /**
@@ -1609,42 +1614,55 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
         serializeAnnotations(result.getAnnotations());
     }
 
-    // TODO Testing for new features
+    //  ____________________________ TODO Testing for new features _______________________
     public void removeAnnotation(FileAnnotation annotation){
-
-        //Might have to force recalculations
-        //Force the serialisation into a separate file.
-        /*for (FileAnnotation ann : this.getAnnotations()) {
-            if (ann.equals(annotation)) {
-                annotations.remove(ann);
-            }
-        }*/
-
-        this.getContainer().getAnnotations(); // change container and then propagate
-
-        //1. Remove annotations
-        //2. perform recalculations
-        //3. serialise all the data back, don't know when shutdown occurs
-
-
-        serializeAnnotations(this.getAnnotations());
+        if (result != null) {
+            this.result.removeAnnotation(annotation);
+            this.initialize(this.history, this.owner, this.defaultEncoding, this.result);
+            serializeAnnotations(this.getAnnotations());
+            serializeParserResult();
+        }
     }
 
     public void loadClassData(){
-        loadResult(); // from file
-        //
-        //performRecalculations(); // override things
-
-    }
-
-    //Necessary to circumvent the build.xml serialisation issue
-    private void performRecalculations(){
-        if (this.owner.number > 30) {
-            this.numberOfWarnings = 4;
-            this.normalWarnings = 1;
-            this.highWarnings = 2;
+        //loadResult(); // Load in annotations
+        //getFixedWarnings(); // Load in fixed warnings??? Is the file serialized somewhere else?
+        if (loadParserResult()) { // Load in the parser....
+            this.initialize(this.history, this.owner, this.defaultEncoding, this.result);
         }
     }
+    
+    private void serializeParserResult(){
+        try {
+            XmlFile file = getParserResultFile();
+            file.write(this.result);
+        } catch (IOException io){
+            System.out.println(io);
+        }
+    }
+
+    // If exists return True for ok, false for no file exists
+    private boolean loadParserResult(){
+        try {
+            XmlFile file = getParserResultFile();
+            if (file.exists()) {
+                this.result = (ParserResult) file.read();
+                return true;
+            }
+        } catch (Exception e){
+            // Failed file
+            System.out.println(e);
+        }
+        return false;
+    }
+
+    private XmlFile getParserResultFile(){
+        XmlFile file = new XmlFile(getXStream(),
+                new File(getOwner().getRootDir(),getSerializationFileName().replace(".xml", "-parserResult.xml")));
+        return file;
+    }
+
+    //  ____________________________ ^TODO Testing for new features _______________________
 
     // Backward compatibility. Do not remove.
     // CHECKSTYLE:OFF
