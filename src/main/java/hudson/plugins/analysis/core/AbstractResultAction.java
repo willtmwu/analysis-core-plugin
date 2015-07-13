@@ -120,6 +120,7 @@ public abstract class AbstractResultAction<T extends BuildResult> implements Sta
 
     @Override @Exported
     public final T getResult() {
+        result.loadClassData();
         return result;
     }
 

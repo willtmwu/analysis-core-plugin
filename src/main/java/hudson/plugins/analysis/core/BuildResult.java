@@ -86,8 +86,6 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     private int numberOfModules;
     /** The default encoding to be used when reading and parsing files. */
     private String defaultEncoding;
-    /** The ParserResult passed in to calculate warnings and obtain annotations. */
-    private ParserResult result;
 
     /** The project containing the annotations. */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("Se")
@@ -268,7 +266,6 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
         this.history = history;
         this.owner = build;
         this.defaultEncoding = defaultEncoding;
-        this.result = result;
 
         modules = new HashSet<String>(result.getModules());
         numberOfModules = modules.size();
@@ -1614,15 +1611,40 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
 
     // TODO Testing for new features
     public void removeAnnotation(FileAnnotation annotation){
-        this.result.removeAnnotation(annotation);
-        initialize(this.history, this.owner, this.defaultEncoding, this.result);
-        serializeAnnotations(this.getAnnotations());
 
         //Might have to force recalculations
         //Force the serialisation into a separate file.
-        //Need to find entry point on startup, or on reload
+        /*for (FileAnnotation ann : this.getAnnotations()) {
+            if (ann.equals(annotation)) {
+                annotations.remove(ann);
+            }
+        }*/
+
+        this.getContainer().getAnnotations(); // change container and then propagate
+
+        //1. Remove annotations
+        //2. perform recalculations
+        //3. serialise all the data back, don't know when shutdown occurs
+
+
+        serializeAnnotations(this.getAnnotations());
     }
 
+    public void loadClassData(){
+        loadResult(); // from file
+        //
+        performRecalculations(); // override things
+
+    }
+
+    //Necessary to circumvent the build.xml serialisation issue
+    private void performRecalculations(){
+        if (this.owner.number > 30) {
+            this.numberOfWarnings = 4;
+            this.normalWarnings = 1;
+            this.highWarnings = 2;
+        }
+    }
 
     // Backward compatibility. Do not remove.
     // CHECKSTYLE:OFF
