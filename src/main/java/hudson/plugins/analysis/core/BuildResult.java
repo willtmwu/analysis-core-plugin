@@ -1633,7 +1633,7 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     public void loadClassData(){
         loadResult(); // from file
         //
-        performRecalculations(); // override things
+        //performRecalculations(); // override things
 
     }
 
