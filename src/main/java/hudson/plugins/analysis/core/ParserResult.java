@@ -341,6 +341,14 @@ public class ParserResult implements Serializable {
         return ImmutableSet.copyOf(annotations);
     }
 
+    public void removeAnnotation(FileAnnotation annotation){
+        for (FileAnnotation ann : annotations) {
+            if (ann.equals(annotation)) {
+                annotations.remove(ann);
+            }
+        }
+    }
+
     /**
      * Returns the total number of annotations for this object.
      *

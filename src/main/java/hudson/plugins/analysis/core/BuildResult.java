@@ -86,6 +86,8 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     private int numberOfModules;
     /** The default encoding to be used when reading and parsing files. */
     private String defaultEncoding;
+    /** The ParserResult passed in to calculate warnings and obtain annotations. */
+    private ParserResult result;
 
     /** The project containing the annotations. */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("Se")
@@ -264,8 +266,9 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     private void initialize(final BuildHistory history, final AbstractBuild<?, ?> build, final String defaultEncoding, // NOCHECKSTYLE
             final ParserResult result) {
         this.history = history;
-        owner = build;
+        this.owner = build;
         this.defaultEncoding = defaultEncoding;
+        this.result = result;
 
         modules = new HashSet<String>(result.getModules());
         numberOfModules = modules.size();
@@ -1610,10 +1613,10 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     }
 
     // TODO Testing for new features
-    public void rmSingleNum(){
-        if(this.numberOfWarnings == 5){
-            this.numberOfWarnings--;
-        }
+    public void removeAnnotation(FileAnnotation annotation){
+        this.result.removeAnnotation(annotation);
+        initialize(this.history, this.owner, this.defaultEncoding, this.result);
+        serializeAnnotations(this.getAnnotations());
     }
 
     // Backward compatibility. Do not remove.
