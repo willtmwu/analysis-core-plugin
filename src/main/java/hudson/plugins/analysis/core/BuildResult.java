@@ -1625,13 +1625,11 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     }
 
     public void loadClassData(){
-        //loadResult(); // Load in annotations
-        //getFixedWarnings(); // Load in fixed warnings??? Is the file serialized somewhere else?
-        if (loadParserResult()) { // Load in the parser....
+        if (loadParserResult()) {
             this.initialize(this.history, this.owner, this.defaultEncoding, this.result);
         }
     }
-    
+
     private void serializeParserResult(){
         try {
             XmlFile file = getParserResultFile();
