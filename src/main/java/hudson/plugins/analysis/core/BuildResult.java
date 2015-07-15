@@ -88,6 +88,8 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     private String defaultEncoding;
     /** The ParseResult used to calculate warnings in this BuildResult */
     private ParserResult result;
+    /** The boolean flag used to check if data for ParserResult has yet been loaded */
+    private boolean classDataLoaded = false;
 
     /** The project containing the annotations. */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("Se")
@@ -1621,12 +1623,15 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
             this.initialize(this.history, this.owner, this.defaultEncoding, this.result);
             serializeAnnotations(this.getAnnotations());
             serializeParserResult();
+            // may need to run evaluate status here
         }
     }
 
     public void loadClassData(){
         if (loadParserResult()) {
+            this.classDataLoaded = true;
             this.initialize(this.history, this.owner, this.defaultEncoding, this.result);
+            // may need to run evaluate status here
         }
     }
 
@@ -1642,10 +1647,12 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     // If exists return True for ok, false for no file exists
     private boolean loadParserResult(){
         try {
-            XmlFile file = getParserResultFile();
-            if (file.exists()) {
-                this.result = (ParserResult) file.read();
-                return true;
+            if (!this.classDataLoaded) {
+                XmlFile file = getParserResultFile();
+                if (file.exists()) {
+                    this.result = (ParserResult) file.read();
+                    return true;
+                }
             }
         } catch (Exception e){
             // Failed file
