@@ -1642,7 +1642,6 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
 
     public void loadClassData(){
         if (loadParserResult()) {
-            this.classDataLoaded = true;
             recalculateAndSerialize();
         }
     }
@@ -1662,6 +1661,7 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
                 XmlFile file = getParserResultFile();
                 if (file.exists()) {
                     this.result = (ParserResult) file.read();
+                    this.classDataLoaded = true;
                     return true;
                 }
             }
