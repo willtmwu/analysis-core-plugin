@@ -1620,18 +1620,30 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     public void removeAnnotation(FileAnnotation annotation){
         if (result != null) {
             this.result.removeAnnotation(annotation);
-            this.initialize(this.history, this.owner, this.defaultEncoding, this.result);
-            serializeAnnotations(this.getAnnotations());
-            serializeParserResult();
-            // may need to run evaluate status here
+            recalculateAndSerialize();
         }
+    }
+
+    public void removeAnnotations(Collection<FileAnnotation> annotations){
+        if (result != null) {
+            for (FileAnnotation annotation : annotations) {
+                this.result.removeAnnotation(annotation);
+            }
+            recalculateAndSerialize();
+        }
+    }
+
+    private void recalculateAndSerialize(){
+        this.initialize(this.history, this.owner, this.defaultEncoding, this.result);
+        serializeAnnotations(this.getAnnotations());
+        serializeParserResult();
+        // may need to run evaluate status here
     }
 
     public void loadClassData(){
         if (loadParserResult()) {
             this.classDataLoaded = true;
-            this.initialize(this.history, this.owner, this.defaultEncoding, this.result);
-            // may need to run evaluate status here
+            recalculateAndSerialize();
         }
     }
 
@@ -1644,7 +1656,6 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
         }
     }
 
-    // If exists return True for ok, false for no file exists
     private boolean loadParserResult(){
         try {
             if (!this.classDataLoaded) {
@@ -1654,9 +1665,8 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
                     return true;
                 }
             }
-        } catch (Exception e){
-            // Failed file
-            System.out.println(e);
+        } catch (IOException io){
+            System.out.println(io);
         }
         return false;
     }
