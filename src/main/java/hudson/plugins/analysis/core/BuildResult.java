@@ -1664,7 +1664,7 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
                     this.classDataLoaded = true;
                     return true;
                 }
-            }
+            } 
         } catch (IOException io){
             System.out.println(io);
         }
