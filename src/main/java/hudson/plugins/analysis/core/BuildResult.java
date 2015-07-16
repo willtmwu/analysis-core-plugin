@@ -1658,11 +1658,9 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     private boolean loadParserResult(){
         try {
             XmlFile file = getParserResultFile();
-            if (file.exists()) {
-                if (!this.classDataLoaded) {
-                    this.result = (ParserResult) file.read();
-                    this.classDataLoaded = true;
-                }
+            if (file.exists() && !this.classDataLoaded) {
+                this.result = (ParserResult) file.read();
+                this.classDataLoaded = true;
                 return true;
             }
         } catch (IOException io){
