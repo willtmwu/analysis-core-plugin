@@ -88,7 +88,7 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     private String defaultEncoding;
     /** The ParseResult used to calculate warnings in this BuildResult */
     private ParserResult result;
-    /** The boolean flag used to check if data for ParserResult has yet been loaded */
+    /** The flag used to check if ParserResult has yet been unserialized from file */
     private boolean classDataLoaded = false;
 
     /** The project containing the annotations. */
