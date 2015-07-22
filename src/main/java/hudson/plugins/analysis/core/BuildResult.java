@@ -313,6 +313,7 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
         defineReferenceBuild(history);
 
         serializeParserResult();
+        this.classDataLoaded = false;
     }
 
     /**
@@ -1641,7 +1642,8 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     }
 
     public void loadClassData(){
-        if (loadParserResult()) {
+        if (!classDataLoaded && loadParserResult()) {
+            classDataLoaded = true;
             recalculateAndSerialize();
         }
     }
@@ -1658,9 +1660,8 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     private boolean loadParserResult(){
         try {
             XmlFile file = getParserResultFile();
-            if (file.exists() && !this.classDataLoaded) {
+            if (file.exists()) {
                 this.result = (ParserResult) file.read();
-                this.classDataLoaded = true;
                 return true;
             }
         } catch (IOException io){
