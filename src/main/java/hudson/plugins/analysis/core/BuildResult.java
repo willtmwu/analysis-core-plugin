@@ -1627,15 +1627,18 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
         return ret;
     }
 
-    public int removeAnnotations(Collection<FileAnnotation> annotations){
+    public Collection<FileAnnotation> removeAnnotations(Collection<FileAnnotation> annotations){
         int ret = 0;
+        Collection<FileAnnotation> nonexistentAnnotations = new ArrayList<FileAnnotation>();
         if (result != null) {
             for (FileAnnotation annotation : annotations) {
-                ret += this.result.removeAnnotation(annotation);
+                if(this.result.removeAnnotation(annotation) == 0){
+                    nonexistentAnnotations.add(annotation);
+                }
             }
             recalculateAndSerialize();
         }
-        return ret;
+        return nonexistentAnnotations;
     }
 
     private void recalculateAndSerialize(){
