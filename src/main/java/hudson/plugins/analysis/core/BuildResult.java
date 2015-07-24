@@ -1618,20 +1618,24 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     }
 
     //  ____________________________ TODO Testing for new features _______________________
-    public void removeAnnotation(FileAnnotation annotation){
+    public int removeAnnotation(FileAnnotation annotation){
+        int ret = 0;
         if (result != null) {
-            this.result.removeAnnotation(annotation);
+            ret = this.result.removeAnnotation(annotation);
             recalculateAndSerialize();
         }
+        return ret;
     }
 
-    public void removeAnnotations(Collection<FileAnnotation> annotations){
+    public int removeAnnotations(Collection<FileAnnotation> annotations){
+        int ret = 0;
         if (result != null) {
             for (FileAnnotation annotation : annotations) {
-                this.result.removeAnnotation(annotation);
+                ret += this.result.removeAnnotation(annotation);
             }
             recalculateAndSerialize();
         }
+        return ret;
     }
 
     private void recalculateAndSerialize(){
