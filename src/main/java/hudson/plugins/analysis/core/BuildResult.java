@@ -1642,7 +1642,7 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     private void recalculateAndSerialize(){
         this.initialize(this.history, this.owner, this.defaultEncoding, this.parserResult);
         serializeAnnotations(this.getAnnotations());
-        //serializeParserResult();
+        serializeParserResult();
         LOGGER.log(Level.INFO, "Results have been serialised for build #" + this.owner.number);
         // may need to re-run evaulateStatus dependant on if threshold is enabled.
     }
