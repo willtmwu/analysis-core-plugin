@@ -1648,7 +1648,7 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     }
 
     public void loadClassData(){
-        if (loadParserResult()) {
+        if (this.classDataLoaded < 10 && loadParserResult()) {
             recalculateAndSerialize();
             LOGGER.log(Level.INFO, String.format("Build Result #%d, class data loaded [%d]", this.owner.number, this.classDataLoaded));
             this.classDataLoaded++;
