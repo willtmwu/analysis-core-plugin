@@ -1669,6 +1669,7 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
             XmlFile file = getParserResultFile();
             if (file.exists()) {
                 this.parserResult = (ParserResult) file.read();
+                LOGGER.log(Level.INFO, String.format("ParserResult [%d] warnings for build %d", this.parserResult.getNumberOfAnnotations(), this.owner.number));
                 return true;
             }
         } catch (IOException io){
