@@ -90,6 +90,7 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     private ParserResult parserResult;
     /** The flag used to check if ParserResult has yet been unserialized from file */
     private boolean classDataLoaded = false;
+    private int callNumber = 0;
 
     /** The project containing the annotations. */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("Se")
@@ -313,7 +314,9 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
         defineReferenceBuild(history);
 
         serializeParserResult();
-        this.classDataLoaded = false;
+        if (this.classDataLoaded == false) {
+            this.classDataLoaded = false;
+        }
     }
 
     /**
@@ -1651,7 +1654,8 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
         if (!classDataLoaded && loadParserResult()) {
             classDataLoaded = true;
             recalculateAndSerialize();
-            //LOGGER.log(Level.INFO, String.format("Build Result #%d, class data loaded", this.owner.number));
+            LOGGER.log(Level.INFO, String.format("Build Result #%d, class data loaded [%d]", this.owner.number, this.callNumber));
+            this.callNumber++;
         }
     }
 
