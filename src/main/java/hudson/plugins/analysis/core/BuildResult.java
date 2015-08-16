@@ -1651,7 +1651,7 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
         if (!classDataLoaded && loadParserResult()) {
             classDataLoaded = true;
             recalculateAndSerialize();
-            LOGGER.log(Level.INFO, "Build Result, class data loaded");
+            //LOGGER.log(Level.INFO, "Build Result, class data loaded");
         }
     }
 
