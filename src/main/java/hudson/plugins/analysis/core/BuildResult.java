@@ -87,7 +87,7 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     /** The default encoding to be used when reading and parsing files. */
     private String defaultEncoding;
     /** The ParseResult used to calculate warnings in this BuildResult */
-    private ParserResult result;
+    private ParserResult parserResult;
     /** The flag used to check if ParserResult has yet been unserialized from file */
     private boolean classDataLoaded = false;
 
@@ -270,7 +270,7 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
         this.history = history;
         this.owner = build;
         this.defaultEncoding = defaultEncoding;
-        this.result = result;
+        this.parserResult = result;
 
         modules = new HashSet<String>(result.getModules());
         numberOfModules = modules.size();
@@ -1617,11 +1617,10 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
         serializeAnnotations(result.getAnnotations());
     }
 
-    //  ____________________________ TODO Testing for new features _______________________
     public int removeAnnotation(FileAnnotation annotation){
         int ret = 0;
-        if (result != null) {
-            ret = this.result.removeAnnotation(annotation);
+        if (this.parserResult != null) {
+            ret = this.parserResult.removeAnnotation(annotation);
             recalculateAndSerialize();
         }
         return ret;
@@ -1630,9 +1629,9 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     public Collection<FileAnnotation> removeAnnotations(Collection<FileAnnotation> annotations){
         int ret = 0;
         Collection<FileAnnotation> nonexistentAnnotations = new ArrayList<FileAnnotation>();
-        if (result != null) {
+        if (this.parserResult != null) {
             for (FileAnnotation annotation : annotations) {
-                if(this.result.removeAnnotation(annotation) == 0){
+                if(this.parserResult.removeAnnotation(annotation) == 0){
                     nonexistentAnnotations.add(annotation);
                 }
             }
@@ -1642,23 +1641,24 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     }
 
     private void recalculateAndSerialize(){
-        this.initialize(this.history, this.owner, this.defaultEncoding, this.result);
+        this.initialize(this.history, this.owner, this.defaultEncoding, this.parserResult);
         serializeAnnotations(this.getAnnotations());
         serializeParserResult();
-        // may need to run evaluate status here
+        // may need to re-run evaulateStatus dependant on if threshold is enabled.
     }
 
     public void loadClassData(){
         if (!classDataLoaded && loadParserResult()) {
             classDataLoaded = true;
             recalculateAndSerialize();
+            LOGGER.log(Level.INFO, "Build Result, class data loaded");
         }
     }
 
     private void serializeParserResult(){
         try {
             XmlFile file = getParserResultFile();
-            file.write(this.result);
+            file.write(this.parserResult);
         } catch (IOException io){
             System.out.println(io);
         }
@@ -1668,7 +1668,7 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
         try {
             XmlFile file = getParserResultFile();
             if (file.exists()) {
-                this.result = (ParserResult) file.read();
+                this.parserResult = (ParserResult) file.read();
                 return true;
             }
         } catch (IOException io){
@@ -1682,8 +1682,6 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
                 new File(getOwner().getRootDir(),getSerializationFileName().replace(".xml", "-parserResult.xml")));
         return file;
     }
-
-    //  ____________________________ ^TODO Testing for new features _______________________
 
     // Backward compatibility. Do not remove.
     // CHECKSTYLE:OFF
