@@ -88,9 +88,8 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     private String defaultEncoding;
     /** The ParseResult used to calculate warnings in this BuildResult */
     private ParserResult parserResult;
-    /** The flag used to check if ParserResult has yet been unserialized from file */
-    private boolean classDataLoaded = false;
-    private int callNumber = 0;
+    /** The flag used to check if ParserResult has yet been serialized from file */
+    private int classDataLoaded = 0;
 
     /** The project containing the annotations. */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("Se")
@@ -314,9 +313,6 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
         defineReferenceBuild(history);
 
         serializeParserResult();
-        if (this.classDataLoaded == false) {
-            this.classDataLoaded = false;
-        }
     }
 
     /**
@@ -1646,16 +1642,16 @@ public abstract class BuildResult implements ModelObject, Serializable, Annotati
     private void recalculateAndSerialize(){
         this.initialize(this.history, this.owner, this.defaultEncoding, this.parserResult);
         serializeAnnotations(this.getAnnotations());
-        serializeParserResult();
+        //serializeParserResult();
+        LOGGER.log(Level.INFO, "Results have been serialised for build #" + this.owner.number);
         // may need to re-run evaulateStatus dependant on if threshold is enabled.
     }
 
     public void loadClassData(){
-        if (!classDataLoaded && loadParserResult()) {
-            classDataLoaded = true;
+        if (loadParserResult()) {
             recalculateAndSerialize();
-            LOGGER.log(Level.INFO, String.format("Build Result #%d, class data loaded [%d]", this.owner.number, this.callNumber));
-            this.callNumber++;
+            LOGGER.log(Level.INFO, String.format("Build Result #%d, class data loaded [%d]", this.owner.number, this.classDataLoaded));
+            this.classDataLoaded++;
         }
     }
 
